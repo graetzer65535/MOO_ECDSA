@@ -1,4 +1,4 @@
-//Actual version
+//Actual version 
 
 #ifndef UBERZAHL_H
 #define UBERZAHL_H
