@@ -1,5 +1,3 @@
-//Actual version 
-
 #ifndef UBERZAHL_H
 #define UBERZAHL_H
 
@@ -11,15 +9,15 @@
 //    * These are used mainly for bit manipulation
 #define smallType unsigned int
 #define largeType unsigned long long
-#define DIGITS 32
+#define DIGITS 2
 
 // maxBits controls how many bits to use our of your smallType container
 // you must ensure that maxBits <= BITLEN(smallType)
-#define maxBits 16
+#define maxBits 2
 
 // mask is used to truncate numbers to the correct bitlength
 // mask must be a value of all 1's maxBits long
-#define mask 0xffffL
+#define mask 0x3L
 
 #define RAND_BITS 16
 
@@ -91,6 +89,6 @@ typedef struct {
     
     void uberzahl_print(const uberzahl* const,FILE*);
     void longUberzahl_print(const longUberzahl* const,FILE*);
-    
+    void RED_init(int,int,int);
 
 #endif

@@ -1,5 +1,3 @@
-//Actual version
-
 #include <assert.h>
 #include <stdio.h>
 #include "Uberzahl2.h"
@@ -520,10 +518,61 @@ void ECC_add(uberzahl* const x2,uberzahl* const y2,uberzahl* const z2,const uber
   if(uberzahl_ge(&yp,&RED_n))
     uberzahl_s(&yp,&yp,&RED_n);
   
-  if(
+  if(uberzahl_eq(&zero,&xm)) {
+    if(uberzahl_eq(&zero,&ym)) {
+      assert(0);
+    } else if(uberzahl_eq(&zero,&yp)) {
+      uberzahl_init(z2);
+      uberzahl_init_i(x2,1);
+      uberzahl_init_i(y2,1);
+      return;
+    }
+  }
+  
   uberzahl z;
   uberzahl_m(&temp,z0,z1);
   uberzahl_red(&z,&temp);
+  
+  uberzahl xm2,ym2z;
+  uberzahl_m(&temp,&xm,&xm);
+  uberzahl_red(&xm2,&temp);
+  uberzahl_m(&temp,&ym,&ym);
+  uberzahl_red(&ym2z,&temp);
+  uberzahl_m(&temp,&ym2z,&z);
+  uberzahl_red(&ym2z,&temp);
+  
+  uberzahl xpxm2;
+  uberzahl_m(&temp,&xp,&xm2);
+  uberzahl_red(&xpxm2,&temp);
+  
+  uberzahl x2t;
+  if(uberzahl_lt(&ym2z,&xpxm2))
+    uberzahl_a(&ym2z,&ym2z,&RED_n);
+  uberzahl_s(&x2t,&ym2z,&xpxm2);
+  uberzahl_ls_mut(&x2t,1);
+  if(uberzahl_ge(&x2t,&RED_n))
+    uberzahl_s(&x2t,&x2t,&RED_n);
+  uberzahl_m(&temp,&x2t,&xm);
+  uberzahl_red(x2,&temp);
+  
+  uberzahl_m(&temp,&xm2,&xm);
+  uberzahl_red(&xm2,&temp);
+  uberzahl_m(&temp,&xm2,&z);
+  uberzahl_red(z2,&temp);
+  uberzahl_ls_mut(z2,1);
+  if(uberzahl_ge(z2,&RED_n))
+    uberzahl_s(z2,z2,&RED_n);
+  
+  uberzahl_m(&temp,&xm2,&yp);
+  uberzahl_red(&xm2,&temp);
+  if(uberzahl_lt(&xpxm2,&x2t))
+    uberzahl_a(&xpxm2,&xpxm2,&RED_n);
+  uberzahl_s(&xpxm2,&xpxm2,&x2t);
+  uberzahl_m(&temp,&xpxm2,&ym);
+  uberzahl_red(&xpxm2,&temp);
+  if(uberzahl_lt(&xpxm2,&xm2))
+    uberzahl_a(&xpxm2,&xpxm2,&RED_n);
+  uberzahl_s(y2,&xpxm2,&xm2);
   
 }
 
@@ -539,5 +588,11 @@ void longUberzahl_print(const longUberzahl* const self, FILE* out) {
   for(i=DIGITS*2-1;i>=0;i--) {
     fprintf(out,"%d ",self->value[i]);
   }
+}
+
+void RED_init(int a,int b,int c) {
+    uberzahl_init_l(&RED_n,a);
+    uberzahl_init_l(&RED_Np,b);
+    RED_bits = c;
 }
 

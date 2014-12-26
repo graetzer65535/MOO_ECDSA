@@ -67,23 +67,59 @@ int main(void) {
   uberzahl t,np;
   uberzahl_inverse(&t,&n,&r);
   uberzahl_s(&np,&r,&t);*/
-  int num;
-  uberzahl a,b,d,f;
-  longUberzahl c,e;
+//  int num;
+//  uberzahl a,b,d,f;
+//  longUberzahl c,e;
 //  uberzahl n,np;
-  random(&RED_n,DIGITS*maxBits);
-  random(&RED_Np,DIGITS*maxBits);
-  for(num=0;num<100000;num++) {
-    random(&a,DIGITS*maxBits);
-    random(&b,DIGITS*maxBits);
-    random(&d,DIGITS*maxBits);
-    uberzahl_m(&c,&a,&b);
-    uberzahl_d(&e,&f,&c,&d);
-    //uberzahl_red(&d,&c,&n,DIGITS*maxBits-1,&np);
-    //uberzahl_print(&a,stdout);printf("\n");
-    //uberzahl_print(&d,stdout);printf("\n");
-    //uberzahl_print(&n,stdout);printf("\n\n");
-    //assert(uberzahl_eq(&d,&a));
-  }
+//  random(&RED_n,DIGITS*maxBits);
+//  random(&RED_Np,DIGITS*maxBits);
+//  for(num=0;num<100000;num++) {
+//    random(&a,DIGITS*maxBits);
+//    random(&b,DIGITS*maxBits);
+//    random(&d,DIGITS*maxBits);
+//    uberzahl_m(&c,&a,&b);
+//    uberzahl_d(&e,&f,&c,&d);
+//    //uberzahl_red(&d,&c,&n,DIGITS*maxBits-1,&np);
+//    //uberzahl_print(&a,stdout);printf("\n");
+//    //uberzahl_print(&d,stdout);printf("\n");
+//    //uberzahl_print(&n,stdout);printf("\n\n");
+//    //assert(uberzahl_eq(&d,&a));
+    
+//  }
+    uberzahl x0,x1,y0,y1,z0,z1;
+    uberzahl x2,y2,z2;
+    uberzahl_init_l(&RED_n,11);
+    uberzahl_init_l(&RED_Np,13);
+    RED_bits = 4;
+    RED_init(11,13,4);//10,8,10,3
+    uberzahl_init_l(&x0,6);
+    uberzahl_init_l(&y0,4);
+    uberzahl_init_l(&z0,5);
+    uberzahl_init_l(&x1,9);
+    uberzahl_init_l(&y1,0);
+    uberzahl_init_l(&z1,5);
+    ECC_add(&x2,&y2,&z2,&x0,&y0,&z0,&x1,&y1,&z1);
+    uberzahl zero;
+    uberzahl_init(&zero);
+    if(uberzahl_neq(&z2,&zero)) {
+      uberzahl zinv;
+      longUberzahl temp,temp2;
+      uberzahl_inverse(&zinv,&z2,&RED_n);
+      uberzahl_m(&temp,&x2,&zinv);
+      uberzahl_d(&temp2,&x2,&temp,&RED_n);
+      uberzahl_m(&temp,&y2,&zinv);
+      uberzahl_d(&temp2,&y2,&temp,&RED_n);
+      uberzahl_init_i(&z2,1);
+    }
+    
+    uberzahl_print(&x0,stdout);printf("\n");
+    uberzahl_print(&y0,stdout);printf("\n");
+    uberzahl_print(&z0,stdout);printf("\n");
+    uberzahl_print(&x1,stdout);printf("\n");
+    uberzahl_print(&y1,stdout);printf("\n");
+    uberzahl_print(&z1,stdout);printf("\n");
+    uberzahl_print(&x2,stdout);printf("\n");
+    uberzahl_print(&y2,stdout);printf("\n");
+    uberzahl_print(&z2,stdout);printf("\n");
   //P4OUT = 0;
 }
