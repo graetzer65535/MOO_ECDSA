@@ -4,6 +4,9 @@
 #include <assert.h>
 #include "Uberzahl2.h"
 
+void hash(uberzahl* const out,const char* const in) {
+  
+}
 
 int main(void) {
   srand(time(0));
@@ -91,14 +94,25 @@ int main(void) {
     uberzahl_init_l(&RED_n,97);
     uberzahl_init_l(&RED_Np,95);
     RED_bits = 7;
+    uberzahl group_order;
+    uberzahl_init_l(&group_order,19);
+    int group_bits = 5;
     RED_init(97,95,7);//10,8,10,3
-    uberzahl_init_l(&x0,26);
-    uberzahl_init_l(&y0,78);
+    uberzahl_init_l(&x0,59);
+    uberzahl_init_l(&y0,86);
     uberzahl_init_l(&z0,31);
-    uberzahl_init_l(&x1,1);
-    uberzahl_init_l(&y1,95);
-    uberzahl_init_l(&z1,23);
-    ECC_mult(&x2,&y2,&z2,&z1,&x0,&y0,&z0);
+
+    uberzahl e;
+    uberzahl_init_l(&e,25);
+/*    hash(&z,"asdf");
+    uberzahl cap;
+    uberzahl_init_i(&cap,1);
+    uberzahl_ls_mut(&cap,group_bits);
+    while(uberzahl_gt(&z,&cap)) {
+      //uberzahl_rs_mut(&z,1);
+    }*/
+    
+    ECC_mult(&x2,&y2,&z2,&e,&x0,&y0,&z0);
     uberzahl zero;
     uberzahl_init(&zero);
     if(uberzahl_neq(&z2,&zero)) {
@@ -112,12 +126,17 @@ int main(void) {
       uberzahl_init_i(&z2,1);
     }
     
+    printf("using %d-bit digits\n",maxBits);
+    printf("g:\n");
     uberzahl_print(&x0,stdout);printf("\n");
     uberzahl_print(&y0,stdout);printf("\n");
     uberzahl_print(&z0,stdout);printf("\n");
     //uberzahl_print(&x1,stdout);printf("\n");
     //uberzahl_print(&y1,stdout);printf("\n");
     //uberzahl_print(&z1,stdout);printf("\n");
+    printf("\ne:\n");
+    uberzahl_print(&e,stdout);printf("\n");
+    printf("\ng^e:\n");
     uberzahl_print(&x2,stdout);printf("\n");
     uberzahl_print(&y2,stdout);printf("\n");
     uberzahl_print(&z2,stdout);printf("\n");
