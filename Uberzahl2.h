@@ -9,7 +9,7 @@
 //    * These are used mainly for bit manipulation
 #define smallType unsigned int
 #define largeType unsigned long long
-#define DIGITS 2
+#define DIGITS 4
 
 // maxBits controls how many bits to use our of your smallType container
 // you must ensure that maxBits <= BITLEN(smallType)
@@ -64,7 +64,7 @@ typedef struct {
     // standard arithmetic operations
     void uberzahl_a (uberzahl* const, const uberzahl* const, const uberzahl* const);
     void uberzahl_s (uberzahl* const, const uberzahl* const, const uberzahl* const);
-    void uberzahl_a_long_mut (longUberzahl* const, const longUberzahl* const);
+    char uberzahl_a_long_mut (longUberzahl* const, const longUberzahl* const);
     void uberzahl_s_long_mut (longUberzahl* const, const longUberzahl* const);
     //void uberzahl_s_mut (uberzahl* const, const uberzahl* const);
     void uberzahl_m (longUberzahl* const, const uberzahl* const, const uberzahl* const);
@@ -86,6 +86,7 @@ typedef struct {
     char uberzahl_inverse_helper (uberzahl* const, uberzahl* const, const uberzahl* const, const uberzahl* const);
     
     void ECC_add(uberzahl* const,uberzahl* const,uberzahl* const,const uberzahl* const,const uberzahl* const,const uberzahl* const,const uberzahl* const,const uberzahl* const,const uberzahl* const);
+    void ECC_mult(uberzahl* const,uberzahl* const,uberzahl* const,const uberzahl* const,const uberzahl* const,const uberzahl* const,const uberzahl* const);
     
     void uberzahl_print(const uberzahl* const,FILE*);
     void longUberzahl_print(const longUberzahl* const,FILE*);

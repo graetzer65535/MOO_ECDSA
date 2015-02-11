@@ -153,8 +153,20 @@ void uberzahl_s (uberzahl* const retval, const uberzahl* const self, const uberz
   if(workbench)
     uberzahl_init(retval);
 }
+void uberzahl_s_mod (uberzahl* const retval, const uberzahl* const self, const uberzahl* const input ) {
+  if(uberzahl_gt(input,self)) {
+    uberzahl_a(retval,self,&RED_n);
+    uberzahl_s(retval,retval,input);
+  } else
+    uberzahl_s(retval,self,input);
+}
+void uberzahl_a_mod (uberzahl* const retval, const uberzahl* const self, const uberzahl* const input ) {
+  uberzahl_a(retval,self,input);
+  if(uberzahl_ge(retval,&RED_n))
+    uberzahl_s(retval,retval,&RED_n);
+}
 
-void uberzahl_a_long_mut (longUberzahl* const self, const longUberzahl* const input )
+char uberzahl_a_long_mut (longUberzahl* const self, const longUberzahl* const input )
 {
   largeType workbench = 0;
   // perform addition operation
@@ -164,6 +176,7 @@ void uberzahl_a_long_mut (longUberzahl* const self, const longUberzahl* const in
     self->value[i] = workbench & mask;
     workbench = workbench >> maxBits;
   }
+  return (char)workbench;
 //  assert(!workbench);
 }
 
@@ -458,6 +471,8 @@ void uberzahl_red (uberzahl* const retval, const longUberzahl* const self) {
   uberzahl r;
   uberzahl_init_i(&r,1);
   uberzahl_ls_mut(&r,RED_bits);
+  longUberzahl k;
+  uberzahl_init_long_u(&k,&r);
   uberzahl_s(&r,&r,&one);
   uberzahl_and(&a,&a,&r);
   longUberzahl b;
@@ -465,8 +480,11 @@ void uberzahl_red (uberzahl* const retval, const longUberzahl* const self) {
   uberzahl_init_u_long(&a,&b);
   uberzahl_and(&a,&a,&r);
   uberzahl_m(&b,&a,&RED_n);
-  uberzahl_a_long_mut(&b,self);
+  char t = uberzahl_a_long_mut(&b,self);
   uberzahl_rs_long_mut(&b,RED_bits);
+  if(t) {
+    uberzahl_a_long_mut(&b,&k);
+  }
   uberzahl_init_u_long(retval,&b);
   if(uberzahl_ge(retval,&RED_n))
     uberzahl_s(retval,retval,&RED_n);
@@ -481,7 +499,7 @@ void ECC_add(uberzahl* const x2,uberzahl* const y2,uberzahl* const z2,const uber
     uberzahl_init_u_u(z2,z0);
     return;
   }
-  if(uberzahl_eq(&zero,z1)) {
+  if(uberzahl_eq(&zero,z0)) {
     uberzahl_init_u_u(x2,x1);
     uberzahl_init_u_u(y2,y1);
     uberzahl_init_u_u(z2,z1);
@@ -499,28 +517,60 @@ void ECC_add(uberzahl* const x2,uberzahl* const y2,uberzahl* const z2,const uber
   uberzahl_red(&y1z,&temp);
   
   uberzahl xp,xm,yp,ym;
-  if(uberzahl_gt(&x1z,&x0z)) {
-    uberzahl_a(&xp,&x0z,&RED_n);
-    uberzahl_s(&xm,&xp,&x1z);
-  } else {
-    uberzahl_s(&xm,&x0z,&x1z);
-  }
-  uberzahl_a(&xp,&x0z,&x1z);
-  if(uberzahl_ge(&xp,&RED_n))
-    uberzahl_s(&xp,&xp,&RED_n);
-  if(uberzahl_gt(&y1z,&y0z)) {
-    uberzahl_a(&yp,&y0z,&RED_n);
-    uberzahl_s(&ym,&yp,&y1z);
-  } else {
-    uberzahl_s(&ym,&y0z,&y1z);
-  }
-  uberzahl_a(&yp,&y0z,&y1z);
-  if(uberzahl_ge(&yp,&RED_n))
-    uberzahl_s(&yp,&yp,&RED_n);
+  uberzahl_s_mod(&xm,&x0z,&x1z);
+  uberzahl_a_mod(&xp,&x0z,&x1z);
+  uberzahl_s_mod(&ym,&y0z,&y1z);
+  uberzahl_a_mod(&yp,&y0z,&y1z);
   
   if(uberzahl_eq(&zero,&xm)) {
     if(uberzahl_eq(&zero,&ym)) {
-      assert(0);
+      //CURRENT
+      uberzahl xmz,xpz,lambda,two,three,four,eight;
+      uberzahl_init_l(&two,62);
+      uberzahl_init_l(&three,93);
+      uberzahl_init_l(&four,27);
+      uberzahl_init_l(&eight,54);
+      uberzahl_s_mod(&xmz,x0,z0);
+      uberzahl_a_mod(&xpz,x0,z0);
+      uberzahl_m(&temp,&xmz,&xpz);
+      uberzahl_red(&lambda,&temp);
+      uberzahl_m(&temp,&lambda,&three);
+      uberzahl_red(&lambda,&temp);
+      uberzahl lambda2;
+      uberzahl_m(&temp,&lambda,&lambda);
+      uberzahl_red(&lambda2,&temp);
+      uberzahl yz,yyz,xyyz,xyyz8;
+      uberzahl_m(&temp,y0,z0);
+      uberzahl_red(&yz,&temp);
+      uberzahl_m(&temp,&yz,y0);
+      uberzahl_red(&yyz,&temp);
+      uberzahl_m(&temp,&yyz,x0);
+      uberzahl_red(&xyyz,&temp);
+      uberzahl_m(&temp,&xyyz,&eight);
+      uberzahl_red(&xyyz8,&temp);
+      uberzahl x2t;
+      uberzahl_s_mod(&x2t,&lambda2,&xyyz8);
+      uberzahl_m(&temp,&x2t,&yz);
+      uberzahl_red(x2,&temp);
+      uberzahl_m(&temp,x2,&two);
+      uberzahl_red(x2,&temp);
+      uberzahl_m(&temp,&xyyz,&four);
+      uberzahl_red(&xyyz,&temp);
+      uberzahl_s_mod(&xyyz,&xyyz,&x2t);
+      uberzahl_m(&temp,&xyyz,&lambda);
+      uberzahl_red(&xyyz,&temp);
+      uberzahl_m(&temp,&yyz,&yz);
+      uberzahl_red(&x2t,&temp);
+      uberzahl_m(&temp,&x2t,z0);
+      uberzahl_red(z2,&temp);
+      uberzahl_m(&temp,z2,&eight);
+      uberzahl_red(z2,&temp);
+      uberzahl_m(&temp,&yyz,&yyz);
+      uberzahl_red(&yyz,&temp);
+      uberzahl_m(&temp,&yyz,&eight);
+      uberzahl_red(&yyz,&temp);
+      uberzahl_s_mod(y2,&xyyz,&yyz);
+      return;
     } else if(uberzahl_eq(&zero,&yp)) {
       uberzahl_init(z2);
       uberzahl_init_i(x2,1);
@@ -546,9 +596,10 @@ void ECC_add(uberzahl* const x2,uberzahl* const y2,uberzahl* const z2,const uber
   uberzahl_red(&xpxm2,&temp);
   
   uberzahl x2t;
-  if(uberzahl_lt(&ym2z,&xpxm2))
-    uberzahl_a(&ym2z,&ym2z,&RED_n);
-  uberzahl_s(&x2t,&ym2z,&xpxm2);
+//  if(uberzahl_lt(&ym2z,&xpxm2))
+//    uberzahl_a(&ym2z,&ym2z,&RED_n);
+//  uberzahl_s(&x2t,&ym2z,&xpxm2);
+  uberzahl_s_mod(&x2t,&ym2z,&xpxm2);
   uberzahl_ls_mut(&x2t,1);
   if(uberzahl_ge(&x2t,&RED_n))
     uberzahl_s(&x2t,&x2t,&RED_n);
@@ -565,15 +616,42 @@ void ECC_add(uberzahl* const x2,uberzahl* const y2,uberzahl* const z2,const uber
   
   uberzahl_m(&temp,&xm2,&yp);
   uberzahl_red(&xm2,&temp);
-  if(uberzahl_lt(&xpxm2,&x2t))
-    uberzahl_a(&xpxm2,&xpxm2,&RED_n);
-  uberzahl_s(&xpxm2,&xpxm2,&x2t);
+//  if(uberzahl_lt(&xpxm2,&x2t))
+//    uberzahl_a(&xpxm2,&xpxm2,&RED_n);
+//  uberzahl_s(&xpxm2,&xpxm2,&x2t);
+  uberzahl_s_mod(&xpxm2,&xpxm2,&x2t);
   uberzahl_m(&temp,&xpxm2,&ym);
   uberzahl_red(&xpxm2,&temp);
-  if(uberzahl_lt(&xpxm2,&xm2))
-    uberzahl_a(&xpxm2,&xpxm2,&RED_n);
-  uberzahl_s(y2,&xpxm2,&xm2);
+//  if(uberzahl_lt(&xpxm2,&xm2))
+//    uberzahl_a(&xpxm2,&xpxm2,&RED_n);
+//  uberzahl_s(y2,&xpxm2,&xm2);
+  uberzahl_s_mod(y2,&xpxm2,&xm2);
   
+}
+
+char getbit(const uberzahl* coeff,largeType index) {
+  smallType temp = coeff->value[index/maxBits];
+  return temp & (1<<(index%maxBits));
+}
+
+void ECC_mult(uberzahl* const x2,uberzahl* const y2,uberzahl* const z2,const uberzahl* const coeff,const uberzahl* const x1,const uberzahl* const y1,const uberzahl* const z1) {
+  uberzahl x3,y3,z3;
+  uberzahl_init_i(x2,1);
+  uberzahl_init_i(y2,1);
+  uberzahl_init(z2);
+  uberzahl_init_u_u(&x3,x1);
+  uberzahl_init_u_u(&y3,y1);
+  uberzahl_init_u_u(&z3,z1);
+  largeType i;
+  for(i=maxBits*DIGITS;i>0;i--) {
+    if(getbit(coeff,i-1)) {
+      ECC_add(x2,y2,z2,x2,y2,z2,&x3,&y3,&z3);
+      ECC_add(&x3,&y3,&z3,&x3,&y3,&z3,&x3,&y3,&z3);
+    } else {
+      ECC_add(&x3,&y3,&z3,&x3,&y3,&z3,x2,y2,z2);
+      ECC_add(x2,y2,z2,x2,y2,z2,x2,y2,z2);
+    }
+  }
 }
 
 void uberzahl_print(const uberzahl* const self, FILE* out) {

@@ -88,17 +88,17 @@ int main(void) {
 //  }
     uberzahl x0,x1,y0,y1,z0,z1;
     uberzahl x2,y2,z2;
-    uberzahl_init_l(&RED_n,11);
-    uberzahl_init_l(&RED_Np,13);
-    RED_bits = 4;
-    RED_init(11,13,4);//10,8,10,3
-    uberzahl_init_l(&x0,6);
-    uberzahl_init_l(&y0,4);
-    uberzahl_init_l(&z0,5);
-    uberzahl_init_l(&x1,9);
-    uberzahl_init_l(&y1,0);
-    uberzahl_init_l(&z1,5);
-    ECC_add(&x2,&y2,&z2,&x0,&y0,&z0,&x1,&y1,&z1);
+    uberzahl_init_l(&RED_n,97);
+    uberzahl_init_l(&RED_Np,95);
+    RED_bits = 7;
+    RED_init(97,95,7);//10,8,10,3
+    uberzahl_init_l(&x0,26);
+    uberzahl_init_l(&y0,78);
+    uberzahl_init_l(&z0,31);
+    uberzahl_init_l(&x1,1);
+    uberzahl_init_l(&y1,95);
+    uberzahl_init_l(&z1,23);
+    ECC_mult(&x2,&y2,&z2,&z1,&x0,&y0,&z0);
     uberzahl zero;
     uberzahl_init(&zero);
     if(uberzahl_neq(&z2,&zero)) {
@@ -115,9 +115,9 @@ int main(void) {
     uberzahl_print(&x0,stdout);printf("\n");
     uberzahl_print(&y0,stdout);printf("\n");
     uberzahl_print(&z0,stdout);printf("\n");
-    uberzahl_print(&x1,stdout);printf("\n");
-    uberzahl_print(&y1,stdout);printf("\n");
-    uberzahl_print(&z1,stdout);printf("\n");
+    //uberzahl_print(&x1,stdout);printf("\n");
+    //uberzahl_print(&y1,stdout);printf("\n");
+    //uberzahl_print(&z1,stdout);printf("\n");
     uberzahl_print(&x2,stdout);printf("\n");
     uberzahl_print(&y2,stdout);printf("\n");
     uberzahl_print(&z2,stdout);printf("\n");
